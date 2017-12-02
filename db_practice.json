@@ -1,1 +1,1 @@
-{"_default": {"1": {"type": "apple", "count": 7, "color": "red"}, "2": {"type": "orange", "count": 9}}}
+{"_default": {"1": {"name": "john", "age": 25}, "2": {"name": "jane", "age": 26}, "3": {"name": "johann", "age": 17}}}
