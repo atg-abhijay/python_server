@@ -49,7 +49,14 @@ def returnAllRestaurants():
 
 def findChefs(cuisine_type, loc):
     Restaurant = Query()
-    return restaurants.search((Restaurant.location == loc) & (Restaurant.cuisine_types.any([cuisine_type])))
+    if cuisine_type == "Anything" and loc == "Anywhere":
+        return returnAllRestaurants()
+    elif cuisine_type == "Anything":
+        return restaurants.search(Restaurant.location == loc)
+    elif loc == "Anywhere":
+        return restaurants.search(Restaurant.cuisine_types.any([cuisine_type]))
+    else:
+        return restaurants.search((Restaurant.location == loc) & (Restaurant.cuisine_types.any([cuisine_type])))
 
 '''
 Actual Endpoints
@@ -64,11 +71,12 @@ def route_findChefs():
     body = request.get_json()
     cuisine_type = body['cuisine_type']
     location = body['location']
-    findChefs(cuisine_type, location)
-    return "Found chefs!"
+    return jsonify({'result': findChefs(cuisine_type, location)})
+    # return "Found chefs!"
 
 @app.route('/api/retrieveDishes', methods=['GET'])
-def retrieveDishes():
+def route_retrieveDishes():
+
     return ""
 
 @app.route('/api/addDish', methods=['POST']) #TODO
