@@ -17,6 +17,16 @@ DB functions
 def addUser(uname, pwd, email):
     users.insert({'username' : uname, 'password' : pwd, "email" : email})
 
+def signIn(uname, pwd):
+    User_query = Query()
+    found_user = users.search(User_query.username == uname)[0]
+    if found_user['password'] == pwd:
+        print("Correct login!")
+        return True
+    else:
+        print("Incorrect login!")
+        return False
+
 def returnAllUsers():
     return users.all()
 
@@ -68,7 +78,7 @@ def addDishToRestaurant(dishID, uname):
     appended_menu.append(dishID)
     restaurants.update({'menu': appended_menu}, Restaurant_query.username == uname)
 
-#TODO
+
 def returnRestaurantDishes(uname):
     Restaurant_query = Query()
     found_restaurant = restaurants.search(Restaurant_query.username == uname)[0]
@@ -139,9 +149,6 @@ def route_deleteDish():
     deleteDish(d_name)
     return "Successfully deleted dish"
 
-@app.route('/api/signIn', methods=['POST'])
-def signIn():
-    return ""
 
 @app.route('/api/fetchRestoProfile', methods=['POST'])
 def fetchRestoProfile():
@@ -177,6 +184,13 @@ def route_getRestaurantDishes():
     dishes_list = returnRestaurantDishes(uname)
     return jsonify({'result': dishes_list})
     # return "Got dishes!"
+
+@app.route('/api/signIn', methods=['POST'])
+def route_signIn():
+    body = request.get_json()
+    uname = body['username']
+    pwd = body['password']
+    return jsonify({'result': signIn(uname, pwd)})
 
 
 '''
