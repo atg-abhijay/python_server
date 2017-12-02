@@ -26,12 +26,12 @@ def addDish(dish_name, dish_price, dish_pic, dish_ingredients):
     return dishID
 
 def deleteDish(d_name):
-    Dish = Query()
-    dishes.remove(Dish.dish_name == d_name)
+    Dish_query = Query()
+    dishes.remove(Dish_query.dish_name == d_name)
 
 def editDish(d_name, d_price, d_ingredients):
-    Dish = Query()
-    dishes.update({'dish_price': d_price, 'dish_ingredients': d_ingredients}, Dish.dish_name == d_name)
+    Dish_query = Query()
+    dishes.update({'dish_price': d_price, 'dish_ingredients': d_ingredients}, Dish_query.dish_name == d_name)
 
 def returnAllDishes():
     return dishes.all()
@@ -42,22 +42,22 @@ def makeRestaurant(uname):
 
 def editRestaurant(uname, owner_name, loc, cuisine_types, restaurant_img, r_name):
     # TODO menu or dishes as parameter as well
-    Restaurant_User = Query()
-    restaurants.update({'owner_name': owner_name, 'location': loc, 'cuisine_types': cuisine_types, 'restaurant_image': restaurant_img, 'restaurant_name': r_name}, Restaurant_User.username == uname)
+    Restaurant_query = Query()
+    restaurants.update({'owner_name': owner_name, 'location': loc, 'cuisine_types': cuisine_types, 'restaurant_image': restaurant_img, 'restaurant_name': r_name}, Restaurant_query.username == uname)
 
 def returnAllRestaurants():
     return restaurants.all()
 
 def findChefs(cuisine_type, loc):
-    Restaurant = Query()
+    Restaurant_query = Query()
     if cuisine_type == "Anything" and loc == "Anywhere":
         return returnAllRestaurants()
     elif cuisine_type == "Anything":
-        return restaurants.search(Restaurant.location == loc)
+        return restaurants.search(Restaurant_query.location == loc)
     elif loc == "Anywhere":
-        return restaurants.search(Restaurant.cuisine_types.any([cuisine_type]))
+        return restaurants.search(Restaurant_query.cuisine_types.any([cuisine_type]))
     else:
-        return restaurants.search((Restaurant.location == loc) & (Restaurant.cuisine_types.any([cuisine_type])))
+        return restaurants.search((Restaurant_query.location == loc) & (Restaurant_query.cuisine_types.any([cuisine_type])))
 
 # called inside addDish()
 def addDishToRestaurant(dishID, uname):
