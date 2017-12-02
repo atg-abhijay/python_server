@@ -69,7 +69,7 @@ def findChefs(cuisine_type, loc):
     else:
         return restaurants.search((Restaurant_query.location == loc) & (Restaurant_query.cuisine_types.any([cuisine_type])))
 
-# called inside addDish()
+# called inside route_addDish()
 def addDishToRestaurant(dishID, uname):
     Restaurant_query = Query()
     found_restaurant = restaurants.search(Restaurant_query.username == uname)[0]
@@ -89,6 +89,13 @@ def returnRestaurantDishes(uname):
         dish = dishes.get(doc_id=dish_number)
         dishes_list.append(dish)
     return dishes_list
+
+def fetchRestaurantProfile(uname):
+    Restaurant_query = Query()
+    found_restaurant = restaurants.search(Restaurant_query.username == uname)[0]
+    dishes_list = returnRestaurantDishes(uname)
+    found_restaurant['dishes'] = dishes_list
+    return found_restaurant
 
 # def addMenu(uname_list):
 #     Restaurant_query = Query()
@@ -192,6 +199,12 @@ def route_signIn():
     pwd = body['password']
     return jsonify({'result': signIn(uname, pwd)})
 
+
+@app.route('/api/fetchRestaurantProfile', methods=['POST'])
+def route_fetchProfile():
+    body = request.get_json()
+    uname = body['username']
+    return jsonify({'result': fetchRestaurantProfile(uname)})
 
 '''
 Test Endpoints
