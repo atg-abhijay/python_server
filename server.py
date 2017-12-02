@@ -22,7 +22,8 @@ def returnAllUsers():
 
 # dishes functionality
 def addDish(dish_name, dish_price, dish_pic, dish_ingredients):
-    dishes.insert({'dish_name': dish_name, 'dish_price': dish_price, 'dish_pic':dish_pic, 'dish_ingredients': dish_ingredients})
+    dishID = dishes.insert({'dish_name': dish_name, 'dish_price': dish_price, 'dish_pic':dish_pic, 'dish_ingredients': dish_ingredients})
+    return dishID
 
 def deleteDish(d_name):
     Dish = Query()
@@ -37,10 +38,10 @@ def returnAllDishes():
 
 # restaurants functionality
 def makeRestaurant(uname):
-    restaurants.insert({'username': uname})
+    restaurants.insert({'username': uname, 'menu' : []})
 
 def editRestaurant(uname, owner_name, loc, cuisine_types, restaurant_img, r_name):
-    # menu or dishes as parameter as well
+    # TODO menu or dishes as parameter as well
     Restaurant_User = Query()
     restaurants.update({'owner_name': owner_name, 'location': loc, 'cuisine_types': cuisine_types, 'restaurant_image': restaurant_img, 'restaurant_name': r_name}, Restaurant_User.username == uname)
 
@@ -57,6 +58,32 @@ def findChefs(cuisine_type, loc):
         return restaurants.search(Restaurant.cuisine_types.any([cuisine_type]))
     else:
         return restaurants.search((Restaurant.location == loc) & (Restaurant.cuisine_types.any([cuisine_type])))
+
+# called inside addDish()
+def addDishToRestaurant(dishID, uname):
+    Restaurant_query = Query()
+    found_restaurant = restaurants.search(Restaurant_query.username == uname)[0]
+    # print(found_restaurant)
+    appended_menu = found_restaurant['menu']
+    appended_menu.append(dishID)
+    restaurants.update({'menu': appended_menu}, Restaurant_query.username == uname)
+
+#TODO
+def returnRestaurantDishes(uname):
+    Restaurant_query = Query()
+    found_restaurant = restaurants.search(Restaurant_query.username == uname)[0]
+    restaurant_menu = found_restaurant['menu']
+    print(restaurant_menu)
+    dishes_list = []
+    for dish_number in restaurant_menu:
+        dish = dishes.get(doc_id=dish_number)
+        dishes_list.append(dish)
+    return dishes_list
+
+# def addMenu(uname_list):
+#     Restaurant_query = Query()
+#     print(uname_list)
+#     restaurants.update({'menu': []}, Restaurant_query.username == "Natsu")
 
 '''
 Actual Endpoints
@@ -86,8 +113,12 @@ def route_addDish():
     d_price = body['dish_price']
     d_pic = body['dish_pic']
     d_ingredients = body['dish_ingredients']
+    uname = body['username']
 
-    addDish(d_name, d_price, d_pic, d_ingredients)
+    #TODO check return of object ID
+    dishID = addDish(d_name, d_price, d_pic, d_ingredients)
+    print(dishID)
+    addDishToRestaurant(dishID, uname)
     return "Successfully added dish"
 
 @app.route('/api/editDish', methods=['POST']) #TODO
@@ -139,6 +170,15 @@ def route_editRestaurant():
     editRestaurant(uname, owner_name, loc, cuisine_types, r_img, r_name)
     return "Successfully edited restaurant"
 
+@app.route('/api/getRestaurantDishes', methods=['POST'])
+def route_getRestaurantDishes():
+    body = request.get_json()
+    uname = body['username']
+    dishes_list = returnRestaurantDishes(uname)
+    return jsonify({'result': dishes_list})
+    # return "Got dishes!"
+
+
 '''
 Test Endpoints
 '''
@@ -154,6 +194,13 @@ def test_returnAllDishes():
 @app.route('/test/returnAllRestaurants', methods=['GET'])
 def test_returnAllRestaurants():
     return jsonify({'result': returnAllRestaurants()})
+
+# @app.route('/test/addMenu', methods=['POST'])
+# def test_addMenu():
+#     body = request.get_json()
+#     uname_list = body['username_list']
+#     addMenu(uname_list)
+#     return "Added menu"
 
 
 if __name__ == "__main__":
