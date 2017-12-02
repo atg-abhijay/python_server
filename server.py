@@ -47,6 +47,10 @@ def editRestaurant(uname, owner_name, loc, cuisine_types, restaurant_img, r_name
 def returnAllRestaurants():
     return restaurants.all()
 
+def findChefs(cuisine_type, loc):
+    Restaurant = Query()
+    return restaurants.search((Restaurant.location == loc) & (Restaurant.cuisine_types.any([cuisine_type])))
+
 '''
 Actual Endpoints
 '''
@@ -56,10 +60,12 @@ def jay():
     return jsonify([{"dish_name" : "aloo", "price": 12}, {"dish_name" : "tikki", "price": 20}, {"dish_name" : "dahai", "price": 15}])
 
 @app.route('/api/findChefs', methods=['POST'])
-def findChefs():
+def route_findChefs():
     body = request.get_json()
-
-    return ""
+    cuisine_type = body['cuisine_type']
+    location = body['location']
+    findChefs(cuisine_type, location)
+    return "Found chefs!"
 
 @app.route('/api/retrieveDishes', methods=['GET'])
 def retrieveDishes():
