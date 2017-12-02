@@ -112,6 +112,19 @@ def route_addUser():
     makeRestaurant(uname)
     return "Successfully added user"
 
+@app.route('/api/editRestaurant', methods=['POST'])
+def route_editRestaurant():
+    body = request.get_json()
+    uname = body['username']
+    owner_name = body['owner_name']
+    loc = body['location']
+    cuisine_types = body['cuisine_types']
+    r_img = body['restaurant_image']
+    r_name = body['restaurant_name']
+
+    editRestaurant(uname, owner_name, loc, cuisine_types, r_img, r_name)
+    return "Successfully edited restaurant"
+
 '''
 Test Endpoints
 '''
