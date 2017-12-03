@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<div id="demo">
+<h2>The XMLHttpRequest Object</h2>
+<button type="button" onclick="findChefs()">Change Content</button>
+<div id="info"></div>
+
+<select id="nb" name="neighbourhood">
+    <option value="Anywhere">Anywhere</option>
+    <option value="Paris">Paris</option>
+    <option value="New York">New York</option>
+    <option value="Iceland">Iceland</option>
+</select>
+
+<select id="ctg" name="categories">
+    <option value="Anything">Anything</option>
+    <option value="Chinese">Chinese</option>
+    <option value="Greek">Greek</option>
+    <option value="Japanese">Japanese</option>
+    <option value="Italian">Italian</option>
+    <option value="Thai">Thai</option>
+    <option value="Mexican">Mexican</option>
+</select>
+<div>After function</div>
+</div>
+
+<script>
+    // const myURL = myRequest.url; // http://localhost/flowers.jpg
+    // const myMethod = myRequest.method; // GET
+    // const myCred = myRequest.credentials; // omit
+
+    function getDetails(url, method) {
+        console.log(url);
+        console.log(method);
+    }
+
+    // let headers = new Headers();
+    // headers.append('Access-Control-Allow-Origin', 'http://localhost:5000/');
+
+    function getAllUsers() {
+        const myRequest = new Request('http://localhost:5000/test/returnAllUsers');
+        getDetails(myRequest.url, myRequest.method);
+        fetch(myRequest, {mode: 'cors'})
+            .then(response => response.json())
+            .then(json => {
+                // myImage.src = URL.createObjectURL(blob);
+                console.log(json);
+                renderHTML(json);
+            })
+            .catch(error =>
+            console.log("Couldn't get users : " + error.message
+            ));
+    }
+
+    Object.prototype.toString = function objectToString(){
+        first_result = this['result'][0];
+        console.log(first_result);
+        details = first_result["email"] + " " + first_result["password"] + " " + first_result["username"];
+        return details;
+    }
+
+    function findChefs() {
+        const body_dict = {"cuisine_type": document.getElementById('ctg').value, "location":document.getElementById('nb').value}
+        // const chefsRequest = new Request('http://localhost:5000/api/findChefs', {method: 'POST',
+        // body: '{"cuisine_type": "Italian", "location":"Paris"}'});
+        const chefsRequest = new Request('http://localhost:5000/api/findChefs', {method: 'POST',
+        body: JSON.stringify(body_dict)});
+        console.log("Here");
+        console.log(body_dict);
+
+        getDetails(chefsRequest.url, chefsRequest.method);
+
+        fetch(chefsRequest)
+            .then(response => {
+                if (response.status === 200) {
+                    // return response.json();
+                    console.log(response.json());
+                    // renderHTML(toString(response.json()));
+                }
+                else {
+                    throw new Error('Something went wrong on api server!');
+                }
+            })
+            .then(response => {
+                console.debug(response);
+            })
+            .catch(error => {
+                console.error(error);
+            });
+
+    }
+
+    function renderHTML(data_to_write){
+        document.getElementById("info").innerHTML = data_to_write;
+    }
+</script>
+
+</body>
+</html>
